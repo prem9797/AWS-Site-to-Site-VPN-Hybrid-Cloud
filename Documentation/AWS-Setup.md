@@ -1,4 +1,4 @@
-## 4. Amazon VPC
+## 1. Amazon VPC
 
 ### Purpose
 
