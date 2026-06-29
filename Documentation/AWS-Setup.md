@@ -127,3 +127,109 @@ An Elastic IP address was associated with the EC2 instance to provide a consiste
 
 Using an Elastic IP ensures that the public IP remains unchanged even if the EC2 instance is restarted.
 
+
+
+##  Customer Gateway
+
+### Purpose
+
+A Customer Gateway (CGW) represents the on-premises VPN device in AWS. In this project, the Customer Gateway represents the Sophos XGS Firewall located in the office network.
+
+The Customer Gateway provides AWS with the information required to establish an IPSec VPN connection with the on-premises firewall.
+
+### Configuration
+
+The Customer Gateway was configured using:
+
+* Public IP address of the Sophos XGS Firewall
+* Border Gateway Protocol (BGP) using the assigned ASN
+* IPSec Site-to-Site VPN
+
+### Why is it required?
+
+Without a Customer Gateway, AWS has no information about the remote firewall that will establish the VPN tunnel.
+
+---
+
+##  Virtual Private Gateway
+
+### Purpose
+
+A Virtual Private Gateway (VGW) is the AWS endpoint for the Site-to-Site VPN.
+
+It is attached to the VPC and securely connects AWS resources to the on-premises office network.
+
+### Configuration
+
+The Virtual Private Gateway was:
+
+* Created in AWS
+* Attached to the Hybrid Cloud VPC
+* Associated with the Site-to-Site VPN connection
+
+### Benefits
+
+* Secure encrypted communication
+* Dynamic route exchange
+* Reliable hybrid cloud connectivity
+
+---
+
+##  Site-to-Site VPN
+
+### Purpose
+
+The Site-to-Site VPN establishes an encrypted IPSec tunnel between the office network and AWS.
+
+This tunnel allows office users to securely access the proxy server deployed inside AWS without exposing internal traffic to the public internet.
+
+### Deployment Steps
+
+1. Create Customer Gateway
+2. Create Virtual Private Gateway
+3. Create Site-to-Site VPN Connection
+4. Download the VPN configuration from AWS
+5. Import the VPN configuration into the Sophos XGS Firewall
+6. Verify that both VPN tunnels are established
+7. Validate route exchange using BGP
+
+
+##  Dynamic Routing using BGP
+
+### Why BGP?
+
+Border Gateway Protocol (BGP) dynamically exchanges network routes between AWS and the on-premises firewall.
+
+Instead of manually maintaining static routes, BGP automatically advertises and learns available networks.
+
+### Advantages
+
+* Automatic route exchange
+* Better scalability
+* Simplified route management
+* Easier future network expansion
+
+BGP was used to ensure reliable communication between AWS resources and the office LAN.
+
+---
+
+##  Validation
+
+After deployment, multiple validation steps were performed to verify the environment.
+
+### Infrastructure Validation
+
+* VPC successfully created
+* Public and Private Subnets available
+* Internet Gateway attached
+* Route Tables configured
+* Security Groups applied
+* EC2 instance accessible through SSH
+* Elastic IP associated
+
+### VPN Validation
+
+* VPN tunnels established successfully
+* BGP routes exchanged successfully
+* Office network reachable from AWS
+
