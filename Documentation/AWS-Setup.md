@@ -21,7 +21,7 @@ The VPC isolates the cloud infrastructure from other AWS customers while allowin
 
 ---
 
-## 5. Public and Private Subnets
+## 2. Public and Private Subnets
 
 ### Purpose
 
@@ -44,7 +44,7 @@ The private subnet is reserved for future expansion and private resources that s
 
 ---
 
-## 6. Internet Gateway
+## 3. Internet Gateway
 
 ### Purpose
 
@@ -65,7 +65,7 @@ Without the Internet Gateway, the Squid Proxy server would not be able to forwar
 
 ---
 
-## 7. Route Tables
+## 4. Route Tables
 
 ### Purpose
 
@@ -87,7 +87,7 @@ This eliminates the need to manually update routes whenever the network changes 
 
 ---
 
-## 8. Security Group Configuration
+## 5. Security Group Configuration
 
 The EC2 instance was protected using AWS Security Groups.
 
@@ -107,7 +107,7 @@ Administrative access was restricted to trusted office networks. Only the minimu
 
 ---
 
-## 9. EC2 Deployment
+## 6. EC2 Deployment
 
 ### Operating System
 
