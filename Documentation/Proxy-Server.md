@@ -242,7 +242,24 @@ This improves compatibility in environments where IPv4 networking is primarily u
 
 ---
 
-# 13. Validate Configuration
+13. Proxy Mode
+
+The Squid server was configured to operate primarily as a forward proxy.
+
+Purpose
+
+The primary objective of the proxy server was not to cache web content, but to securely forward outbound client traffic through the AWS-hosted public IP address.
+
+This design allowed office users to access client applications that required requests to originate from a United States IP address.
+
+Caching
+
+No dedicated disk cache (cache_dir) was configured as part of this implementation.
+
+The proxy server was optimized for secure traffic forwarding rather than content caching.
+
+
+# 14. Validate Configuration
 
 Before restarting Squid, validate the configuration syntax.
 
@@ -256,7 +273,7 @@ Checks the Squid configuration for syntax errors without restarting the service.
 
 ---
 
-# 14. Restart the Squid Service
+# 15. Restart the Squid Service
 
 ```bash
 sudo systemctl restart squid
@@ -270,7 +287,7 @@ sudo systemctl status squid
 
 ---
 
-# 15. Verify Listening Port
+# 16. Verify Listening Port
 
 ```bash
 sudo ss -tulpn | grep 3128
@@ -282,7 +299,7 @@ Confirms that Squid is actively listening on TCP port 3128.
 
 ---
 
-# 16. Monitor Proxy Logs
+# 17. Monitor Proxy Logs
 
 The Squid access log is located at:
 
@@ -302,7 +319,7 @@ Used during deployment and testing to confirm that client requests were reaching
 
 ---
 
-# 17. Security Best Practices
+# 18. Security Best Practices
 
 The following security practices were followed during deployment:
 
@@ -315,9 +332,21 @@ The following security practices were followed during deployment:
 
 ---
 
-# 18. Outcome
+# 19. Outcome
 
-The Ubuntu server was successfully configured as an enterprise Squid Proxy Server capable of securely handling proxy requests from approximately 100 office users.
 
-The proxy server was prepared for integration with the on-premises Sophos XGS Firewall through the AWS Site-to-Site VPN, allowing office users to securely access client applications through a US-based public IP address.
+The Ubuntu 24.04 LTS server was successfully configured as an enterprise Squid Forward Proxy hosted on AWS EC2.
+
+The server was prepared to receive traffic from the on-premises network through the AWS Site-to-Site VPN and Sophos XGS Firewall.
+
+Key achievements:
+
+- Successfully deployed Squid Proxy on Ubuntu 24.04 LTS.
+- Restricted proxy access using Access Control Lists (ACLs).
+- Applied performance tuning parameters for stable operation.
+- Configured the proxy to listen on TCP port 3128.
+- Validated the Squid configuration and service status.
+- Prepared the server for secure integration with the hybrid cloud network.
+
+The next phase of the implementation involved importing the AWS VPN configuration into the Sophos XGS Firewall, configuring BGP, creating firewall and NAT policies, and establishing secure communication between the office network and AWS.
 
