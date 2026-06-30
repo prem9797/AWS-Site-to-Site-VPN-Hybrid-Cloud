@@ -224,3 +224,236 @@ The AWS Site-to-Site VPN was successfully deployed, providing secure hybrid clou
 The encrypted VPN tunnel enabled office traffic to securely reach the Ubuntu-based Squid Proxy Server, while BGP automatically managed route exchange between the AWS VPC and the on-premises Sophos XGS Firewall.
 
 The VPN formed the foundation for secure communication within the hybrid cloud architecture.
+
+
+
+
+# VPN Technical Deep Dive
+
+## IPSec Overview
+
+Internet Protocol Security (IPSec) is a suite of protocols used to establish secure, encrypted communication between two networks over an untrusted network such as the Internet.
+
+In this project, IPSec was used to securely connect the on-premises office network with the AWS Virtual Private Cloud (VPC). Although the VPN tunnel traverses the public Internet, all traffic exchanged between AWS and the office remains encrypted and protected from unauthorized access.
+
+The IPSec implementation provides the following security features:
+
+* Encryption of all transmitted data
+* Authentication of VPN peers
+* Data integrity verification
+* Protection against packet tampering
+* Secure communication across public networks
+
+By implementing IPSec, office users can securely access AWS resources without exposing internal network traffic to the Internet.
+
+---
+
+# VPN Tunnel Establishment
+
+The Site-to-Site VPN tunnel is established between two endpoints:
+
+| Endpoint         | Component                                  |
+| ---------------- | ------------------------------------------ |
+| AWS Side         | Virtual Private Gateway (VGW)              |
+| On-Premises Side | Sophos XGS 136 Firewall (Customer Gateway) |
+
+The establishment process follows these stages:
+
+1. AWS creates the VPN connection.
+2. AWS generates the VPN configuration file.
+3. The configuration is imported into the Sophos Firewall.
+4. Both VPN peers exchange authentication information.
+5. Phase 1 (IKE) is negotiated.
+6. Phase 2 (IPSec) is negotiated.
+7. IPSec Security Associations (SAs) are created.
+8. BGP neighbors establish across the encrypted tunnel.
+9. Dynamic routes are exchanged.
+10. The VPN tunnel becomes operational.
+
+Once the tunnel is established, all communication between AWS and the office network flows through the encrypted IPSec tunnel.
+
+---
+
+# Phase 1 (IKE)
+
+Internet Key Exchange (IKE) Phase 1 establishes a secure and trusted communication channel between AWS and the Sophos Firewall.
+
+Its primary objective is to authenticate both VPN peers and negotiate the security parameters that will be used for the VPN tunnel.
+
+During Phase 1, both peers agree on:
+
+* Encryption algorithm
+* Authentication algorithm
+* Diffie-Hellman group
+* Lifetime of the Security Association (SA)
+
+After successful authentication, an encrypted management channel is created.
+
+This channel is used to securely negotiate Phase 2.
+
+Without a successful Phase 1 negotiation, the IPSec tunnel cannot be established.
+
+---
+
+# Phase 2 (IPSec)
+
+Once the secure IKE channel has been established, Phase 2 negotiates how user traffic will be encrypted.
+
+Phase 2 creates the IPSec Security Associations responsible for protecting actual network traffic.
+
+During this phase, both peers negotiate:
+
+* Traffic selectors
+* Encryption parameters
+* Integrity algorithms
+* Perfect Forward Secrecy (if configured)
+* Security Association lifetime
+
+After Phase 2 completes successfully, encrypted communication between AWS and the office network begins.
+
+This is the phase responsible for protecting application traffic.
+
+---
+
+# BGP over the VPN Tunnel
+
+Border Gateway Protocol (BGP) was implemented to dynamically exchange network routes between AWS and the on-premises Sophos Firewall.
+
+Instead of manually creating static routes, BGP automatically advertises and learns available networks.
+
+Once the IPSec tunnel becomes operational:
+
+1. BGP neighbors establish across the VPN.
+2. AWS advertises the VPC routes.
+3. Sophos advertises the office network routes.
+4. Both devices update their routing tables automatically.
+
+### Benefits of using BGP
+
+* Dynamic route learning
+* Simplified administration
+* Automatic failover support
+* Better scalability
+* Easier future expansion
+
+Because BGP handles route exchange automatically, adding new networks requires minimal manual configuration.
+
+---
+
+# Traffic Flow
+
+The following illustrates the complete path taken by a client request.
+
+```text
+Office User
+      │
+      ▼
+Firefox Browser
+      │
+      ▼
+Office LAN
+      │
+      ▼
+Sophos XGS Firewall
+      │
+      ▼
+IPSec Encryption
+      │
+═══════════════════════════════════════
+        AWS Site-to-Site VPN Tunnel
+═══════════════════════════════════════
+      │
+      ▼
+Virtual Private Gateway
+      │
+      ▼
+AWS Route Table
+      │
+      ▼
+Ubuntu EC2 Instance
+      │
+      ▼
+Squid Proxy
+      │
+      ▼
+Internet Gateway
+      │
+      ▼
+Internet
+      │
+      ▼
+Client Application
+```
+
+### Traffic Flow Explanation
+
+1. A user initiates a request from Firefox.
+2. The request reaches the Sophos Firewall.
+3. The firewall identifies AWS as the destination.
+4. The packet is encrypted using IPSec.
+5. The encrypted packet traverses the Internet.
+6. AWS decrypts the packet at the Virtual Private Gateway.
+7. The request reaches the Ubuntu EC2 instance.
+8. Squid forwards the request to the Internet.
+9. The destination application sees the AWS public IP address instead of the office public IP.
+10. The response follows the same path in reverse.
+
+---
+
+# Validation
+
+After deployment, several validation checks were performed.
+
+## VPN Validation
+
+* Tunnel status displayed as **Connected**.
+* IPSec tunnel remained stable during testing.
+
+## Route Validation
+
+* BGP neighbors established successfully.
+* AWS VPC routes were learned by the Sophos Firewall.
+* Office routes were advertised to AWS.
+
+## Connectivity Validation
+
+* AWS EC2 instance became reachable through the VPN.
+* Squid Proxy received requests successfully.
+* Client application was accessible through the AWS public IP.
+
+---
+
+# Monitoring
+
+Continuous monitoring was performed to verify tunnel health and traffic flow.
+
+The following components were monitored:
+
+### AWS
+
+* VPN Tunnel Status
+* Route Propagation
+* EC2 Health
+
+### Sophos Firewall
+
+* VPN Status
+* BGP Neighbor Status
+* Firewall Logs
+* Traffic Logs
+
+### Ubuntu Server
+
+* Squid Service Status
+* Squid Access Logs
+* System Resource Utilization
+
+Monitoring ensured that encrypted communication remained stable and that office traffic continued to route successfully through the AWS-hosted proxy server.
+
+---
+
+# Key Takeaways
+
+This implementation demonstrates the integration of AWS networking, IPSec VPN technology, dynamic routing with BGP, Linux administration, and enterprise firewall configuration to build a secure hybrid cloud environment.
+
+The combination of AWS Site-to-Site VPN, Sophos XGS Firewall, Ubuntu Linux, and Squid Proxy enabled office users to securely access client applications through a US-based public IP while maintaining encrypted communication between the office network and AWS.
