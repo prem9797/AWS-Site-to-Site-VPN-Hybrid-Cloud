@@ -350,3 +350,21 @@ Key achievements:
 
 The next phase of the implementation involved importing the AWS VPN configuration into the Sophos XGS Firewall, configuring BGP, creating firewall and NAT policies, and establishing secure communication between the office network and AWS.
 
+# 20. Traffic Flow
+
+Office User
+      │
+      ▼
+Firefox Browser
+      │
+      ▼
+Squid Proxy (Ubuntu EC2)
+      │
+      ▼
+AWS Internet Gateway
+      │
+      ▼
+Internet
+      │
+      ▼
+Client Application
